@@ -67,7 +67,17 @@ Template.people.events({
         var receiver = Session.get('currentlySelected').owner;
         var receiverUni = Session.get('currentlySelected').uni;
         var receiverName = Session.get('currentlySelected').name;
-        var senderUni = $("#senderUni").val();
+        Meteor.call('getSenderUni', Meteor.userId(), function(error, response) {
+          if (error) {
+            Materialize.toast('Failed to get uni', 4000);
+            console.log(error);
+          } else {
+            console.log(response);
+            Session.set('senderUni', response);
+          }
+        });
+        var senderUni = Session.get('senderUni');
+        console.log(senderUni);
         var recaptcha = reCAPTCHA.getResponse("1");
 
         if(senderUni != receiverUni) {

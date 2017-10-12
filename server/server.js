@@ -5,6 +5,22 @@ Meteor.methods({
   countMeetings: function () {
     return MeetingsCollection.find().fetch().length;
   },
+
+  getSenderUni: function(id) {
+    console.log("here");
+    var convertAsyncToSync  = Meteor.wrapAsync(function(id) {
+      var user = PeopleCollection.findOne({owner: id});
+      console.log("in function");
+      console.log(user['uni']);
+      result = user['uni'];
+    }),
+      resultOfAsyncToSync = convertAsyncToSync(id, {} );
+
+    console.log("result");
+    console.log(resultOfAsyncToSync.data.exists);
+    return resultOfAsyncToSync;
+  },
+
   processSendRequest: function (senderUni, receiver, receiverUni, receiverName, recaptcha) {
     // Check recaptcha
     if(!reCAPTCHA.verifyCaptcha(this.connection.clientAddress, recaptcha)) {
@@ -36,7 +52,7 @@ Meteor.methods({
           this.unblock();
 
           var senderName = GetFirstName(senderUni);
-          UniCollection.insert({uni: senderUni, name: senderName});   
+          UniCollection.insert({uni: senderUni, name: senderName});
 
           SendEmailForCoffee(senderUni, senderName, receiverUni, receiverEmail, receiverName);
         } else {
@@ -54,10 +70,10 @@ Meteor.methods({
 
     // Move to rejected users
     var userToMove = PendingPeopleCollection.findOne({owner: id});
-    RejectedPeopleCollection.update({owner: id}, 
+    RejectedPeopleCollection.update({owner: id},
                                     {$set: {
-                                      owner: id, 
-                                      username: userToMove.username,        
+                                      owner: id,
+                                      username: userToMove.username,
                                       name: userToMove.name,
                                       uni: userToMove.uni,
                                       school: userToMove.school,
@@ -82,7 +98,7 @@ Meteor.methods({
                                     var to = userToMove.username;
                                     var from = 'do-not-reply@coffeecu.com';
                                     var subject = 'Coffee at Columbia: Profile update declined';
-                                    var body = "Hi,\n\n" + 
+                                    var body = "Hi,\n\n" +
                                       "Your recent profile update request to Coffee at Columbia was rejected.\n\nReason: " + reason + "\n\nPlease make the above changes and request an update to your profile again at http://coffeecu.com.\n\nCheers,\nThe Coffee at Columbia Team ";
                                     SendEmail(to, "", from, subject, body);
   },
@@ -112,8 +128,8 @@ Meteor.methods({
                                 PendingPeopleCollection.update(
                                   {owner: id},
                                   {$set: {
-                                    owner: id, 
-                                    username: username,        
+                                    owner: id,
+                                    username: username,
                                     name: name,
                                     uni: uni,
                                     school: school,
@@ -140,10 +156,10 @@ Meteor.methods({
                                   return;
                                 }
                                 var userToMove = PendingPeopleCollection.findOne({owner: id});
-                                PeopleCollection.update({ owner: id }, 
+                                PeopleCollection.update({ owner: id },
                                                         {$set: {
-                                                          owner: id, 
-                                                          username: userToMove.username,        
+                                                          owner: id,
+                                                          username: userToMove.username,
                                                           name: userToMove.name,
                                                           uni: userToMove.uni,
                                                           school: userToMove.school,
@@ -171,7 +187,7 @@ Meteor.methods({
                                 }
                                 PeopleCollection.remove({ owner: id });
                                 PendingPeopleCollection.remove({ owner: id });
-                                RejectedPeopleCollection.remove({ owner: id });                         
+                                RejectedPeopleCollection.remove({ owner: id });
                               }
 });
 
@@ -200,8 +216,8 @@ var SendEmailForCoffee = function (senderUni, senderName, receiverUni, receiverE
   var cc = senderUni + '@columbia.edu';
   var from = 'do-not-reply@coffeecu.com';
   var subject = 'Coffee at Columbia: Request from ' + senderName;
-  var body = "Hi " + receiverName + ",\n\n" + 
-    senderName + " (cc'ed) wants to chat with you. You two should set some time to hang out. Some great places to meet at Columbia are: Joe's in NoCo, Up Coffee in the Journalism building, Brownie's Cafe in Avery, Carleton Lounge in Mudd or Cafe East in Lerner. Have a great time talking!\n\n" + 
+  var body = "Hi " + receiverName + ",\n\n" +
+    senderName + " (cc'ed) wants to chat with you. You two should set some time to hang out. Some great places to meet at Columbia are: Joe's in NoCo, Up Coffee in the Journalism building, Brownie's Cafe in Avery, Carleton Lounge in Mudd or Cafe East in Lerner. Have a great time talking!\n\n" +
     "Cheers,\nThe Coffee at Columbia Team\n\n" + "Visit http://coffeecu.com to meet more people.";
 
   SendEmail(to, cc, from, subject, body);
@@ -243,5 +259,5 @@ var LogMeeting = function(senderUni, receiverUni) {
 };
 
 IsAdmin = function(id) {
-  return Meteor.settings.private.admins.indexOf(id) > -1;  
+  return Meteor.settings.private.admins.indexOf(id) > -1;
 };
