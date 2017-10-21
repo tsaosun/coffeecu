@@ -1,6 +1,6 @@
-# Coffee at Columbia
+# Coffee@CU
 
-To run locally, clone the repo with `git clone --recursive https://github.com/parthibanloganathan/coffeecu.git` so that you get the submodule for [materialize-custom](https://github.com/parthibanloganathan/materialize-custom) as well.
+To run locally, clone the repo with `git clone https://github.com/thecolumbialion/coffeecu.git` so that you get the submodule for [materialize-custom](https://github.com/parthibanloganathan/materialize-custom) as well.
 
 You need to create a file called `settings.json` at `coffeecu/` formatted as follows:
 ```
@@ -46,7 +46,7 @@ Install Meteor first with `curl https://install.meteor.com/ | sh`. Finally perfo
 
 To restore a database given a database dump (you can ask Lesley to grab one), use . `mongorestore -h 127.0.0.1 --port 3001 -d meteor PATH` where `PATH` is the path to your restoration directory.
 
-Only tested on Chrome. ¯\\\_(ツ)_/¯
+Tested on Chrome and Safari. ¯\\\_(ツ)_/¯
 
 
 Dependencies
