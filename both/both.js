@@ -66,13 +66,18 @@ RejectedPeopleCollection.deny({
   }
 });
 
+
+
+
 // Search box
 PeopleIndex = new EasySearch.Index({
   collection: PeopleCollection,
   fields: ['name', 'school', 'major', 'contactfor', 'availability', 'likes', 'about', 'uni'],
-  engine: new EasySearch.MongoDB(),
+  engine: new EasySearch.MongoDB(
+    {sort: () => {random_sort: 1}}),
   name: 'peopleIndex',
   defaultSearchOptions: {
     limit: 9
   },
-});
+});  
+

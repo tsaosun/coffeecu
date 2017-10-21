@@ -10,9 +10,16 @@ Tracker.autorun(function () {
 
 Session.set('currentlySelected', null);
 
+
 Template.people.rendered = function () {
   $(document).ready(function(){
     $('.ui.accordion').accordion({exclusive: true});
+
+    window.onscroll = function(ev) { if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+      setTimeout(function(){
+        $('.load-more-button').click();
+      }, 100);
+    }};
   });
 };
 

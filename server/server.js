@@ -171,6 +171,32 @@ Meteor.methods({
                               }
 });
 
+ SyncedCron.add({
+  name: 'Randomize profiles every once in a while',
+  schedule: function(parser) {
+    // parser is a later.parse object
+    return parser.cron('every 10 seconds');
+  },
+  job: function() {
+    console.log("I changed the profile pictures!");
+    people = PeopleCollection.find();
+    people.forEach(function randomize(person) {
+      id = person.owner;
+      PeopleCollection.update(
+        {owner: id},
+        {$set: {
+          random_sort: Math.random()
+        }}
+      );
+    });
+  }
+}); 
+
+SyncedCron.start();
+
+
+
+
 var SendEmailForCoffee = function (senderUni, senderName, receiverUni, receiverEmail, receiverName) {
   var to = receiverEmail;
   var replyTo = receiverEmail;
