@@ -21,10 +21,16 @@ Meteor.methods({
     return resultOfAsyncToSync;
   },
 
-  processSendRequest: function (senderUni, receiver, receiverUni, receiverName, recaptcha) {
+  processSendRequest: function (senderId, receiver, receiverUni, receiverName, additionalMessage, recaptcha) {
     // Check recaptcha
     if(!reCAPTCHA.verifyCaptcha(this.connection.clientAddress, recaptcha)) {
       return "We're not sending that request since we suspect that you're a robot";
+    }
+
+    var senderUni = PeopleCollection.findOne({owner: senderId})['uni'];
+
+    if (senderUni == receiverUni){
+      return "Cannot send a coffee request to yourself";
     }
 
     if(BlacklistCollection.find({ uni: senderUni }).fetch().length > 0) {
@@ -54,7 +60,7 @@ Meteor.methods({
           var senderName = GetFirstName(senderUni);
           UniCollection.insert({uni: senderUni, name: senderName});
 
-          SendEmailForCoffee(senderUni, senderName, receiverUni, receiverEmail, receiverName);
+          SendEmailForCoffee(senderUni, senderName, receiverUni, receiverEmail, receiverName, additionalMessage);
         } else {
           return "Invalid UNI";
         }
@@ -211,7 +217,7 @@ SyncedCron.add({
   }
 });
 
-var SendEmailForCoffee = function (senderUni, senderName, receiverUni, receiverEmail, receiverName) {
+var SendEmailForCoffee = function (senderUni, senderName, receiverUni, receiverEmail, receiverName, additionalMessage) {
   var to = receiverEmail;
   var replyTo = receiverEmail;
   var cc = senderUni + '@columbia.edu';
@@ -219,7 +225,7 @@ var SendEmailForCoffee = function (senderUni, senderName, receiverUni, receiverE
   var subject = 'Coffee at Columbia: Request from ' + senderName;
   var body = "Hi " + receiverName + ",\n\n" +
     senderName + " (cc'ed) wants to chat with you. You two should set some time to hang out. Some great places to meet at Columbia are: Joe's in NoCo, Up Coffee in the Journalism building, Brownie's Cafe in Avery, Carleton Lounge in Mudd or Cafe East in Lerner. Have a great time talking!\n\n" +
-    "Cheers,\nThe Coffee at Columbia Team\n\n" + "Visit http://coffeecu.com to meet more people.";
+    "Cheers,\nThe Coffee at Columbia Team\n\n" + "Visit http://coffeecu.com to meet more people.\n\n" + additionalMessage;
 
   SendEmail(to, replyTo, cc, from, subject, body);
 

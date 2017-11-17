@@ -117,11 +117,11 @@
 
 <template name="uniPrompt">
   <div class="ui modal">
-    <div class="header">Please enter your UNI</div>
+      <div class="header">Enter the message you want to send</div>
     <div class="content">
       <div class="field">
-        <input type="text" name="senderUni" id="senderUni" />
-        <label for="senderUni">UNI</label>
+        <input type="text" name="Additional Message" id="Additional Message" />
+        <label for="Additional Message">Additional Message</label>
         <div class="field recaptcha-box">
           <label>Complete the reCAPTCHA before sending your request</label>
           {{> reCAPTCHA widget_id="1"}}

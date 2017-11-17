@@ -67,29 +67,17 @@ Template.people.events({
         var receiver = Session.get('currentlySelected').owner;
         var receiverUni = Session.get('currentlySelected').uni;
         var receiverName = Session.get('currentlySelected').name;
-        Meteor.call('getSenderUni', Meteor.userId(), function(error, response) {
-          if (error) {
-            Materialize.toast('Failed to get uni', 4000);
-            console.log(error);
-          } else {
-            console.log(response);
-            Session.set('senderUni', response);
-          }
-        });
-        var senderUni = Session.get('senderUni');
-        console.log(senderUni);
+        var additionalMessage = Session.get('additionalMessage');
         var recaptcha = reCAPTCHA.getResponse("1");
 
-        if(senderUni != receiverUni) {
-          Meteor.call('processSendRequest', senderUni, receiver, receiverUni, receiverName, recaptcha, function (error, response) {
-            if (error) {
-              Materialize.toast('Failed to send email', 4000);
-              console.log(error);
-            } else {
-              Materialize.toast(response, 4000);
-            }
-          });
-        }
+        Meteor.call('processSendRequest', Meteor.userId(), receiver, receiverUni, receiverName, additionalMessage, recaptcha, function (error, response) {
+          if (error) {
+            Materialize.toast('Failed to send email', 4000);
+            console.log(error);
+          } else {
+            Materialize.toast(response, 4000);
+          }
+        });
 
         reCAPTCHA.reset("1");
       }
